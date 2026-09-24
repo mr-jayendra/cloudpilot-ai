@@ -4,6 +4,7 @@
   "name": "cloudpilot",
   "type": "module",
   "license": "MIT",
+  "repository": "https://github.com/mr-jayendra/cloudpilot-ai",
   "scripts": {
     "typecheck": "tsgo --noEmit",
     "test": "bun test --timeout 30000 --only-failures",

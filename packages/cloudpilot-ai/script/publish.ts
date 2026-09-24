@@ -63,6 +63,7 @@ await Bun.file(`./dist/${pkg.name}/package.json`).write(
   JSON.stringify(
     {
       name: pkg.name + "-ai",
+      repository: "https://github.com/mr-jayendra/cloudpilot-ai",
       bin: {
         [pkg.name]: `./bin/${pkg.name}.exe`,
       },

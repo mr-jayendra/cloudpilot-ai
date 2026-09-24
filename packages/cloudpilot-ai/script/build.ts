@@ -148,6 +148,7 @@ for (const item of targets) {
       {
         name,
         version: Script.version,
+        repository: "https://github.com/mr-jayendra/cloudpilot-ai",
         preferUnplugged: true,
         os: [item.os],
         cpu: [item.arch],
