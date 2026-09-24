@@ -4,7 +4,10 @@
   "name": "cloudpilot",
   "type": "module",
   "license": "MIT",
-  "repository": "https://github.com/mr-jayendra/cloudpilot-ai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mr-jayendra/cloudpilot-ai.git"
+  },
   "scripts": {
     "typecheck": "tsgo --noEmit",
     "test": "bun test --timeout 30000 --only-failures",

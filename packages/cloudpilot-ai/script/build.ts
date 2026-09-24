@@ -148,7 +148,10 @@ for (const item of targets) {
       {
         name,
         version: Script.version,
-        repository: "https://github.com/mr-jayendra/cloudpilot-ai",
+        repository: {
+          type: "git",
+          url: "git+https://github.com/mr-jayendra/cloudpilot-ai.git",
+        },
         preferUnplugged: true,
         os: [item.os],
         cpu: [item.arch],
