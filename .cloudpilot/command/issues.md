@@ -3,7 +3,7 @@ description: "find issue(s) on github"
 model: cloudpilot/claude-haiku-4-5
 ---
 
-Search through existing issues in anomalyco/cloudpilot using the gh cli to find issues matching this query:
+Search through existing issues in mr-jayendra/cloudpilot-ai using the gh cli to find issues matching this query:
 
 $ARGUMENTS
 

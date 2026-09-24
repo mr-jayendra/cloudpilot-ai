@@ -1,0 +1,7 @@
+{
+  "$id": "https://mr-jayendra.github.io/cloudpilot-ai/config.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CloudPilot config",
+  "description": "Terminal-only CloudPilot AI config. See https://mr-jayendra.github.io/cloudpilot-ai/docs for fields.",
+  "type": "object"
+}

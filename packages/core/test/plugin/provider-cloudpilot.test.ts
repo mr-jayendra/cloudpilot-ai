@@ -94,7 +94,7 @@ describe("CloudpilotPlugin", () => {
             Response.json({
               device_code: "device",
               user_code: "user",
-              verification_uri_complete: "/console/device?user_code=user&client_id=opencode-cli",
+              verification_uri_complete: "/console/device?user_code=user&client_id=cloudpilot-cli",
               expires_in: 60,
               interval: 60,
             }),
@@ -108,7 +108,7 @@ describe("CloudpilotPlugin", () => {
         methodID: Integration.MethodID.make("device"),
         inputs: {},
       })
-      expect(attempt.url).toBe("https://opencode.ai/console/device?user_code=user&client_id=opencode-cli")
+      expect(attempt.url).toBe("https://mr-jayendra.github.io/cloudpilot-ai/console/device?user_code=user&client_id=cloudpilot-cli")
     }),
   )
 

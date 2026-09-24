@@ -68,7 +68,6 @@ import { SessionExecution } from "@cloudpilot-ai/core/session/execution"
 import * as SessionExecutionLocal from "@cloudpilot-ai/core/session/execution/local"
 import { lazy } from "@/util/lazy"
 import { CorsConfig, isAllowedCorsOrigin, type CorsOptions } from "@cloudpilot-ai/server/cors"
-import { serveUIEffect } from "@/server/shared/ui"
 import { ServerAuth } from "@/server/auth"
 import { InstanceHttpApi, RootHttpApi } from "./api"
 import { Api } from "@cloudpilot-ai/server/api"
@@ -193,12 +192,8 @@ const docRoute = HttpRouter.use((router) => router.add("GET", "/doc", () => Effe
 
 const uiRoute = HttpRouter.use((router) =>
   Effect.gen(function* () {
-    const fs = yield* FSUtil.Service
-    const client = yield* HttpClient.HttpClient
-    const flags = yield* RuntimeFlags.Service
-    yield* router.add("*", "/*", (request) =>
-      serveUIEffect(request, { fs, client, disableEmbeddedWebUi: flags.disableEmbeddedWebUi }),
-    )
+    // Terminal-only CLI: web UI is disabled.
+    yield* router.add("*", "/*", () => Effect.succeed(HttpServerResponse.jsonUnsafe({ error: "Not Found" }, { status: 404 })))
   }),
 ).pipe(Layer.provide(authOnlyRouterLayer))
 

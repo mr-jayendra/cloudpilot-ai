@@ -52,7 +52,7 @@ const bootstrapFixture = Effect.gen(function* () {
     Bun.write(
       path.join(dir, "cloudpilot.json"),
       JSON.stringify({
-        $schema: "https://opencode.ai/config.json",
+        $schema: "https://mr-jayendra.github.io/cloudpilot-ai/config.json",
         plugin: [pathToFileURL(pluginFile).href],
       }),
     ),

@@ -465,7 +465,7 @@ function custom(dep: CustomDep): Record<string, CustomLoader> {
         autoload: false,
         options: {
           headers: {
-            "HTTP-Referer": "https://opencode.ai/",
+            "HTTP-Referer": "https://mr-jayendra.github.io/cloudpilot-ai/",
             "X-Title": "cloudpilot",
             "X-Source": "cloudpilot",
           },
@@ -476,7 +476,7 @@ function custom(dep: CustomDep): Record<string, CustomLoader> {
         autoload: false,
         options: {
           headers: {
-            "HTTP-Referer": "https://opencode.ai/",
+            "HTTP-Referer": "https://mr-jayendra.github.io/cloudpilot-ai/",
             "X-Title": "cloudpilot",
           },
         },
@@ -486,7 +486,7 @@ function custom(dep: CustomDep): Record<string, CustomLoader> {
         autoload: provider.source === "config",
         options: {
           headers: {
-            "HTTP-Referer": "https://opencode.ai/",
+            "HTTP-Referer": "https://mr-jayendra.github.io/cloudpilot-ai/",
             "X-Title": "cloudpilot",
             "X-BILLING-INVOKE-ORIGIN": "CloudPilot",
           },
@@ -497,7 +497,7 @@ function custom(dep: CustomDep): Record<string, CustomLoader> {
         autoload: false,
         options: {
           headers: {
-            "http-referer": "https://opencode.ai/",
+            "http-referer": "https://mr-jayendra.github.io/cloudpilot-ai/",
             "x-title": "cloudpilot",
           },
         },
@@ -602,7 +602,7 @@ function custom(dep: CustomDep): Record<string, CustomLoader> {
         autoload: false,
         options: {
           headers: {
-            "HTTP-Referer": "https://opencode.ai/",
+            "HTTP-Referer": "https://mr-jayendra.github.io/cloudpilot-ai/",
             "X-Title": "cloudpilot",
           },
         },
@@ -892,7 +892,7 @@ function custom(dep: CustomDep): Record<string, CustomLoader> {
         autoload: false,
         options: {
           headers: {
-            "HTTP-Referer": "https://opencode.ai/",
+            "HTTP-Referer": "https://mr-jayendra.github.io/cloudpilot-ai/",
             "X-Title": "cloudpilot",
           },
         },

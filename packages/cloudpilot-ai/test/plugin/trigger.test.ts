@@ -41,7 +41,7 @@ function withProject<A, E, R>(source: string, self: Effect.Effect<A, E, R>) {
             path.join(test.directory, "cloudpilot.json"),
             JSON.stringify(
               {
-                $schema: "https://opencode.ai/config.json",
+                $schema: "https://mr-jayendra.github.io/cloudpilot-ai/config.json",
                 plugin: [pathToFileURL(file).href],
               },
               null,

@@ -190,7 +190,7 @@ export const prepare = Effect.fn("LLMRequestPrep.prepare")(function* (input: Pre
             ...(cloudpilotProjectID ? { "x-cloudpilot-project": cloudpilotProjectID } : {}),
             "x-cloudpilot-session": input.sessionID,
             "x-cloudpilot-request": input.user.id,
-            "x-opencode-client": input.flags.client,
+            "x-cloudpilot-client": input.flags.client,
             "User-Agent": USER_AGENT,
           }
         : {

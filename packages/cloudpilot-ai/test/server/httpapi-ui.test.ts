@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto"
 import { describe, expect } from "bun:test"
 import { Flag } from "@cloudpilot-ai/core/flag/flag"
 import { ConfigProvider, Effect, Layer, Option } from "effect"
@@ -184,31 +183,24 @@ function responseText(response: Response) {
 }
 
 describe("HttpApi UI fallback", () => {
-  it.live("serves the web UI through the HTTP API app", () =>
+  it.live("web UI is disabled in terminal-only builds", () =>
     Effect.gen(function* () {
-      let proxiedUrl: string | undefined
-
       const response = yield* uiApp({
         disableEmbeddedWebUi: true,
         client: httpClient(
           new Response("<html>cloudpilot</html>", { headers: { "content-type": "text/html" } }),
-          (request) => {
-            proxiedUrl = request.url
-          },
+          (_request) => {},
         ),
       }).request("/")
 
-      expect(response.status).toBe(200)
-      expect(response.headers.get("content-type")).toContain("text/html")
-      expect(yield* responseText(response)).toBe("<html>cloudpilot</html>")
-      expect(proxiedUrl).toBe("https://app.opencode.ai/")
+      expect(response.status).toBe(404)
+      expect(yield* responseText(response)).toContain("Not Found")
+      // UI disabled (terminal-only)
     }),
   )
 
-  it.live("strips upstream transfer encoding headers from proxied assets", () =>
+  it.live("UI assets are disabled in terminal-only builds", () =>
     Effect.gen(function* () {
-      let proxiedUrl: string | undefined
-
       const response = yield* Effect.gen(function* () {
         const fs = yield* FSUtil.Service
         const client = yield* HttpClient.HttpClient
@@ -224,11 +216,10 @@ describe("HttpApi UI fallback", () => {
             RuntimeFlags.layer({ disableEmbeddedWebUi: true }),
             Layer.succeed(
               HttpClient.HttpClient,
-              HttpClient.make((request) => {
-                proxiedUrl = request.url
-                return Effect.succeed(
+              HttpClient.make((_request) =>
+                Effect.succeed(
                   HttpClientResponse.fromWeb(
-                    request,
+                    _request,
                     new Response("console.log('ok')", {
                       headers: {
                         "content-encoding": "br",
@@ -237,27 +228,25 @@ describe("HttpApi UI fallback", () => {
                       },
                     }),
                   ),
-                )
-              }),
+                ),
+              ),
             ),
           ),
         ),
         Effect.map(HttpServerResponse.toWeb),
       )
 
-      expect(response.status).toBe(200)
-      expect(proxiedUrl).toBe("https://app.opencode.ai/assets/app.js")
-      expect(response.headers.get("content-encoding")).toBeNull()
-      expect(response.headers.get("content-length")).not.toBe("999")
-      expect(response.headers.get("content-type")).toContain("text/javascript")
-      expect(yield* responseText(response)).toBe("console.log('ok')")
+      expect(response.status).toBe(404)
+      // UI disabled (terminal-only)
+      expect(yield* responseText(response)).toContain("Not Found")
     }),
   )
 
   // Regression for #25698 (Ope): upstream `transfer-encoding: chunked` was
   // forwarded through the proxy while the proxy itself re-frames the body,
   // causing browsers to fail with `ERR_INVALID_CHUNKED_ENCODING`.
-  it.live("strips upstream transfer-encoding header from proxied assets", () =>
+  // Terminal-only: UI proxy removed, route returns 404.
+  it.live("UI root is disabled in terminal-only builds", () =>
     Effect.gen(function* () {
       const response = yield* Effect.gen(function* () {
         const fs = yield* FSUtil.Service
@@ -274,10 +263,10 @@ describe("HttpApi UI fallback", () => {
             RuntimeFlags.layer({ disableEmbeddedWebUi: true }),
             Layer.succeed(
               HttpClient.HttpClient,
-              HttpClient.make((request) =>
+              HttpClient.make((_request) =>
                 Effect.succeed(
                   HttpClientResponse.fromWeb(
-                    request,
+                    _request,
                     new Response("<html>cloudpilot</html>", {
                       headers: {
                         "transfer-encoding": "chunked",
@@ -293,66 +282,34 @@ describe("HttpApi UI fallback", () => {
         Effect.map(HttpServerResponse.toWeb),
       )
 
-      expect(response.status).toBe(200)
-      expect(response.headers.get("transfer-encoding")).toBeNull()
-      expect(yield* responseText(response)).toBe("<html>cloudpilot</html>")
+      expect(response.status).toBe(404)
+      expect(yield* responseText(response)).toContain("Not Found")
     }),
   )
 
-  it.live("serves embedded UI assets when Bun can read them but access reports missing", () =>
+  it.live("embedded UI is disabled in terminal-only builds", () =>
     Effect.gen(function* () {
-      let readPath: string | undefined
-
       const fs = yield* FSUtil.Service
       const response = yield* serveEmbeddedUIEffect(
         "/assets/app.js",
-        {
-          ...fs,
-          existsSafe: () => Effect.die("embedded UI should not rely on filesystem access checks"),
-          readFile: (path) => {
-            readPath = path
-            return path === "/$bunfs/root/assets/app.js"
-              ? Effect.succeed(new TextEncoder().encode("console.log('embedded')"))
-              : Effect.die(`unexpected embedded UI path: ${path}`)
-          },
-        },
+        fs,
         { "assets/app.js": "/$bunfs/root/assets/app.js" },
       ).pipe(Effect.map(HttpServerResponse.toWeb))
 
-      expect(response.status).toBe(200)
-      expect(readPath).toBe("/$bunfs/root/assets/app.js")
-      expect(response.headers.get("content-type")).toContain("text/javascript")
-      expect(yield* responseText(response)).toBe("console.log('embedded')")
+      expect(response.status).toBe(404)
+      expect(yield* responseText(response)).toContain("Not Found")
     }),
   )
 
-  it.live("allows embedded UI terminal wasm, blob attachments, and theme preload CSP", () =>
+  it.live("embedded UI index is disabled in terminal-only builds", () =>
     Effect.gen(function* () {
-      const script = 'document.documentElement.dataset.theme = "dark"'
-
       const fs = yield* FSUtil.Service
-      const response = yield* serveEmbeddedUIEffect(
-        "/",
-        {
-          ...fs,
-          readFile: (path) => {
-            return path === "/$bunfs/root/index.html"
-              ? Effect.succeed(
-                  new TextEncoder().encode(
-                    `<html><head><script id="oc-theme-preload-script">${script}</script></head></html>`,
-                  ),
-                )
-              : Effect.die(`unexpected embedded UI path: ${path}`)
-          },
-        },
-        { "index.html": "/$bunfs/root/index.html" },
-      ).pipe(Effect.map(HttpServerResponse.toWeb))
+      const response = yield* serveEmbeddedUIEffect("/", fs, { "index.html": "/$bunfs/root/index.html" }).pipe(
+        Effect.map(HttpServerResponse.toWeb),
+      )
 
-      const csp = response.headers.get("content-security-policy") ?? ""
-      expect(csp).toContain("script-src 'self' 'wasm-unsafe-eval'")
-      expect(csp).toContain(`'sha256-${createHash("sha256").update(script).digest("base64")}'`)
-      expect(csp).toContain("img-src 'self' data: https: blob:")
-      expect(csp).toContain("connect-src * data: blob:")
+      expect(response.status).toBe(404)
+      expect(yield* responseText(response)).toContain("Not Found")
     }),
   )
 
@@ -388,8 +345,9 @@ describe("HttpApi UI fallback", () => {
         client: httpClient(new Response("<html>cloudpilot</html>", { headers: { "content-type": "text/html" } })),
       }).request(`/?auth_token=${btoa("cloudpilot:secret")}`)
 
-      expect(response.status).toBe(200)
-      expect(yield* responseText(response)).toBe("<html>cloudpilot</html>")
+      // UI disabled (terminal-only): authed UI routes return 404, not proxied HTML.
+      expect(response.status).toBe(404)
+      expect(yield* responseText(response)).toContain("Not Found")
     }),
   )
 
@@ -403,7 +361,7 @@ describe("HttpApi UI fallback", () => {
         headers: { authorization: `Basic ${btoa("cloudpilot:secret")}` },
       })
 
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(404)
     }),
   )
 
@@ -417,16 +375,16 @@ describe("HttpApi UI fallback", () => {
         headers: { authorization: `Basic ${btoa("cloudpilot:sec:ret")}` },
       })
 
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(404)
     }),
   )
 
   // Regression for #25698 (Ope): the browser fetches the PWA manifest and
   // its icons via flows that don't carry app-managed credentials (the
   // `<link rel="manifest">` request is not under page-auth control), so the
-  // server returning 401 breaks PWA install. These specific public assets
-  // should bypass auth.
-  it.live("serves the PWA manifest without auth even when a server password is set", () =>
+  // server returning 401 breaks PWA install. Terminal-only builds have no
+  // web UI at all, so every UI route requires auth when a password is set.
+  it.live("PWA manifest routes require auth in terminal-only builds", () =>
     Effect.gen(function* () {
       for (const path of ["/site.webmanifest", "/web-app-manifest-192x192.png", "/web-app-manifest-512x512.png"]) {
         const response = yield* uiApp({
@@ -435,7 +393,7 @@ describe("HttpApi UI fallback", () => {
           disableEmbeddedWebUi: true,
           client: httpClient(new Response("ok")),
         }).request(path)
-        expect(response.status).not.toBe(401)
+        expect(response.status).toBe(401)
       }
     }),
   )

@@ -240,7 +240,7 @@ describe("SessionStatus.Info", () => {
         title: "Free limit reached",
         message: "Subscribe to CloudPilot Go.",
         label: "subscribe",
-        link: "https://opencode.ai/go",
+        link: "https://mr-jayendra.github.io/cloudpilot-ai/go",
       },
       next: 500,
     }

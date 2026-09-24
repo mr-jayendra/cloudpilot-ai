@@ -399,7 +399,7 @@ describe("workspace HttpApi", () => {
             "content-type": "application/json",
             "x-cloudpilot-workspace": "internal",
           },
-          body: JSON.stringify({ $schema: "https://opencode.ai/config.json" }),
+          body: JSON.stringify({ $schema: "https://mr-jayendra.github.io/cloudpilot-ai/config.json" }),
         })
 
         const responseBody = yield* response.text
@@ -416,7 +416,7 @@ describe("workspace HttpApi", () => {
               "content-type": "application/json",
               "x-target-auth": "secret",
             }),
-            body: JSON.stringify({ $schema: "https://opencode.ai/config.json" }),
+            body: JSON.stringify({ $schema: "https://mr-jayendra.github.io/cloudpilot-ai/config.json" }),
           },
         ])
         expect(forwarded[0]?.headers).not.toHaveProperty("x-cloudpilot-directory")

@@ -285,7 +285,7 @@ export const githubInstall = Effect.fn("Cli.github.install")(function* () {
         if (installation) return s.stop("GitHub app already installed")
 
         // Open browser
-        const url = "https://github.com/apps/opencode-agent"
+        const url = "https://github.com/apps/cloudpilot-agent"
         const command =
           process.platform === "darwin"
             ? `open "${url}"`
@@ -321,7 +321,7 @@ export const githubInstall = Effect.fn("Cli.github.install")(function* () {
         s.stop("Installed GitHub app")
 
         async function getInstallation() {
-          return await fetch(`https://api.opencode.ai/get_github_app_installation?owner=${app.owner}&repo=${app.repo}`)
+          return await fetch(`https://mr-jayendra.github.io/cloudpilot-ai/api/get_github_app_installation?owner=${app.owner}&repo=${app.repo}`)
             .then((res) => res.json())
             .then((data) => data.installation)
         }
@@ -363,7 +363,7 @@ jobs:
           persist-credentials: false
 
       - name: Run cloudpilot
-        uses: anomalyco/cloudpilot/github@latest${envStr}
+        uses: mr-jayendra/cloudpilot-ai/github@latest${envStr}
         with:
           model: ${provider}/${model}`,
         )
@@ -427,7 +427,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
         ? (payload as IssueCommentEvent | IssuesEvent).issue.number
         : (payload as PullRequestEvent | PullRequestReviewCommentEvent).pull_request.number
     const runUrl = `/${owner}/${repo}/actions/runs/${runId}`
-    const shareBaseUrl = isMock ? "https://dev.opencode.ai" : "https://opencode.ai"
+    const shareBaseUrl = isMock ? "https://mr-jayendra.github.io/cloudpilot-ai" : "https://mr-jayendra.github.io/cloudpilot-ai/"
 
     let appToken: string
     let octoRest: Octokit
@@ -694,7 +694,7 @@ export const githubRun = Effect.fn("Cli.github.run")(function* (args: { event?: 
 
     function normalizeOidcBaseUrl(): string {
       const value = process.env["OIDC_BASE_URL"]
-      if (!value) return "https://api.opencode.ai"
+      if (!value) return "https://mr-jayendra.github.io/cloudpilot-ai/api"
       return value.replace(/\/+$/, "")
     }
 

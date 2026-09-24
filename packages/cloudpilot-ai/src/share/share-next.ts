@@ -207,7 +207,7 @@ const layer = Layer.effect(
       const headers: Record<string, string> = {}
       const active = yield* account.active()
       if (Option.isNone(active) || !active.value.active_org_id) {
-        const baseUrl = (yield* cfg.get()).enterprise?.url ?? "https://opncd.ai"
+        const baseUrl = (yield* cfg.get()).enterprise?.url ?? "https://mr-jayendra.github.io/cloudpilot-ai"
         return { headers, api: legacyApi, baseUrl } satisfies Req
       }
 

@@ -74,7 +74,7 @@ describe("plugin.workspace", () => {
           path.join(dir, "cloudpilot.json"),
           JSON.stringify(
             {
-              $schema: "https://opencode.ai/config.json",
+              $schema: "https://mr-jayendra.github.io/cloudpilot-ai/config.json",
               plugin: [pathToFileURL(file).href],
             },
             null,
