@@ -20,7 +20,13 @@ async function publish(dir: string, name: string, version: string) {
     return
   }
   await $`bun pm pack`.cwd(dir)
-  await $`npm publish *.tgz --access public --tag ${Script.channel}`.cwd(dir)
+  // Trusted publishing (GitHub OIDC) requires --provenance; local token
+  // publishes must NOT pass it (provenance only works inside CI).
+  if (process.env.GITHUB_ACTIONS === "true") {
+    await $`npm publish *.tgz --access public --tag ${Script.channel} --provenance`.cwd(dir)
+  } else {
+    await $`npm publish *.tgz --access public --tag ${Script.channel}`.cwd(dir)
+  }
 }
 
 const binaries: Record<string, string> = {}
