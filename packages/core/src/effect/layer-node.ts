@@ -182,6 +182,14 @@ function walk<Result>(
   const stack: AnyNode[] = []
 
   const recur = (node: AnyNode): Result => {
+    // An undefined node here means a `deps` array captured an uninitialized
+    // binding, almost always a circular import that only breaks under code
+    // splitting. Fail loudly instead of crashing on `node.name` downstream.
+    if (node === undefined) {
+      throw new Error(
+        "Undefined layer node in dependency tree: check for circular imports between layer modules.",
+      )
+    }
     const target = options.resolve?.(node) ?? node
     const cached = cache.get(target)
     if (cached !== undefined || cache.has(target)) return cached!
