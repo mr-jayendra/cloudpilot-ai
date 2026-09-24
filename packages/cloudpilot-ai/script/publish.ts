@@ -74,10 +74,20 @@ await Bun.file(`./dist/${pkg.name}/package.json`).write(
   ),
 )
 
-const tasks = Object.entries(binaries).map(async ([name]) => {
-  await publish(`./dist/${name}`, name, binaries[name])
-})
-await Promise.all(tasks)
+const results = await Promise.allSettled(
+  Object.entries(binaries).map(async ([name]) => {
+    await publish(`./dist/${name}`, name, binaries[name])
+  }),
+)
+const failed = results.filter((result) => result.status === "rejected")
+for (const result of failed) {
+  console.error(`platform publish failed: ${String((result as PromiseRejectedResult).reason).split("\n").slice(0, 5).join(" ")}`)
+}
+if (failed.length === Object.keys(binaries).length) {
+  throw new Error("all platform publishes failed, aborting wrapper publish")
+}
+// A missing variant (e.g. arm64/baseline not on the registry yet) is fine:
+// postinstall falls back to the next matching platform package.
 await publish(`./dist/${pkg.name}`, `${pkg.name}-ai`, version)
 
 // Terminal-only CLI: Docker, AUR, Homebrew publishing removed.
