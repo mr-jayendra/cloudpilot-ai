@@ -20,6 +20,7 @@ const singleFlag = process.argv.includes("--single")
 const baselineFlag = process.argv.includes("--baseline")
 const skipInstall = process.argv.includes("--skip-install")
 const sourcemapsFlag = process.argv.includes("--sourcemaps")
+const skipSmokeFlag = process.argv.includes("--skip-smoke")
 const plugin = createSolidTransformPlugin()
 // Terminal-only CLI: web UI is never embedded.
 const treeSitterWorker = await Bun.file(fileURLToPath(import.meta.resolve("@opentui/core/parser.worker"))).text()
@@ -127,8 +128,9 @@ for (const item of targets) {
     },
   })
 
-  // Smoke test: only run if binary is for current platform
-  if (item.os === process.platform && item.arch === process.arch && !item.abi) {
+  // Smoke test: only run if binary is for current platform (skipped with
+  // --skip-smoke on machines whose application-control policy blocks it).
+  if (!skipSmokeFlag && item.os === process.platform && item.arch === process.arch && !item.abi) {
     const binaryPath = `dist/${name}/bin/cloudpilot`
     console.log(`Running smoke test: ${binaryPath} --version`)
     try {

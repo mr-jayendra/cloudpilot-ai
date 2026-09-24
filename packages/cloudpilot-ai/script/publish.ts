@@ -25,8 +25,10 @@ async function publish(dir: string, name: string, version: string) {
 
 const binaries: Record<string, string> = {}
 for (const filepath of new Bun.Glob("*/package.json").scanSync({ cwd: "./dist" })) {
-  const pkg = await Bun.file(`./dist/${filepath}`).json()
-  binaries[pkg.name] = pkg.version
+  // Skip the wrapper package from previous runs so reruns stay idempotent.
+  if (filepath.startsWith(`${pkg.name}/`)) continue
+  const bin = await Bun.file(`./dist/${filepath}`).json()
+  binaries[bin.name] = bin.version
 }
 console.log("binaries", binaries)
 const version = Object.values(binaries)[0]
