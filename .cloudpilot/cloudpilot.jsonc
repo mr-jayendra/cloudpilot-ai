@@ -1,0 +1,43 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {},
+  "permission": {},
+  "references": {
+    "effect": {
+      "repository": "github.com/Effect-TS/effect-smol",
+      "description": "Use for Effect v4 and effect-smol implementation details",
+    },
+    "cloudpilot-local": {
+      "path": "~/.local/share/cloudpilot",
+      "description": "Contains cloudpilot logs and data",
+    },
+  },
+  "mcp": {
+    "servers": {
+      "aws-mcp": {
+        "type": "local",
+        "command": [
+          "uvx",
+          "mcp-proxy-for-aws@latest",
+          "https://aws-mcp.us-east-1.api.aws/mcp",
+          "--metadata",
+          "INSTALL_SOURCE=aws-cli"
+        ],
+        "environment": {
+          "AWS_MCP_PROXY_PROFILES": "default"
+        }
+      },
+      "render": {
+        "type": "remote",
+        "url": "https://mcp.render.com/mcp",
+        "headers": {
+          "Authorization": "Bearer {env:RENDER_API_KEY}"
+        }
+      }
+    }
+  },
+  "tools": {
+    "github-triage": false,
+    "github-pr-search": false,
+  },
+}

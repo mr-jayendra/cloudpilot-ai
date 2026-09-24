@@ -1,0 +1,78 @@
+import { Config } from "effect"
+
+export function truthy(key: string) {
+  const value = process.env[key]?.toLowerCase()
+  return value === "true" || value === "1"
+}
+
+const copy = process.env["CLOUDPILOT_EXPERIMENTAL_DISABLE_COPY_ON_SELECT"]
+const fff = process.env["CLOUDPILOT_DISABLE_FFF"]
+
+function enabledByExperimental(key: string) {
+  return process.env[key] === undefined ? truthy("CLOUDPILOT_EXPERIMENTAL") : truthy(key)
+}
+
+export const Flag = {
+  OTEL_EXPORTER_OTLP_ENDPOINT: process.env["OTEL_EXPORTER_OTLP_ENDPOINT"],
+  OTEL_EXPORTER_OTLP_HEADERS: process.env["OTEL_EXPORTER_OTLP_HEADERS"],
+
+  CLOUDPILOT_AUTO_HEAP_SNAPSHOT: truthy("CLOUDPILOT_AUTO_HEAP_SNAPSHOT"),
+  CLOUDPILOT_GIT_BASH_PATH: process.env["CLOUDPILOT_GIT_BASH_PATH"],
+  CLOUDPILOT_CONFIG: process.env["CLOUDPILOT_CONFIG"],
+  CLOUDPILOT_CONFIG_CONTENT: process.env["CLOUDPILOT_CONFIG_CONTENT"],
+  CLOUDPILOT_DISABLE_AUTOUPDATE: truthy("CLOUDPILOT_DISABLE_AUTOUPDATE"),
+  CLOUDPILOT_ALWAYS_NOTIFY_UPDATE: truthy("CLOUDPILOT_ALWAYS_NOTIFY_UPDATE"),
+  CLOUDPILOT_DISABLE_PRUNE: truthy("CLOUDPILOT_DISABLE_PRUNE"),
+  CLOUDPILOT_DISABLE_TERMINAL_TITLE: truthy("CLOUDPILOT_DISABLE_TERMINAL_TITLE"),
+  CLOUDPILOT_SHOW_TTFD: truthy("CLOUDPILOT_SHOW_TTFD"),
+  CLOUDPILOT_DISABLE_AUTOCOMPACT: truthy("CLOUDPILOT_DISABLE_AUTOCOMPACT"),
+  CLOUDPILOT_DISABLE_MODELS_FETCH: truthy("CLOUDPILOT_DISABLE_MODELS_FETCH"),
+  CLOUDPILOT_DISABLE_MOUSE: truthy("CLOUDPILOT_DISABLE_MOUSE"),
+  CLOUDPILOT_FAKE_VCS: process.env["CLOUDPILOT_FAKE_VCS"],
+  CLOUDPILOT_SERVER_PASSWORD: process.env["CLOUDPILOT_SERVER_PASSWORD"],
+  CLOUDPILOT_SERVER_USERNAME: process.env["CLOUDPILOT_SERVER_USERNAME"],
+  CLOUDPILOT_DISABLE_FFF: fff === undefined ? process.platform === "win32" : truthy("CLOUDPILOT_DISABLE_FFF"),
+
+  // Experimental
+  CLOUDPILOT_EXPERIMENTAL_FILEWATCHER: Config.boolean("CLOUDPILOT_EXPERIMENTAL_FILEWATCHER").pipe(
+    Config.withDefault(false),
+  ),
+  CLOUDPILOT_EXPERIMENTAL_DISABLE_FILEWATCHER: Config.boolean("CLOUDPILOT_EXPERIMENTAL_DISABLE_FILEWATCHER").pipe(
+    Config.withDefault(false),
+  ),
+  CLOUDPILOT_EXPERIMENTAL_DISABLE_COPY_ON_SELECT:
+    copy === undefined ? process.platform === "win32" : truthy("CLOUDPILOT_EXPERIMENTAL_DISABLE_COPY_ON_SELECT"),
+  CLOUDPILOT_MODELS_URL: process.env["CLOUDPILOT_MODELS_URL"],
+  CLOUDPILOT_MODELS_PATH: process.env["CLOUDPILOT_MODELS_PATH"],
+  CLOUDPILOT_DB: process.env["CLOUDPILOT_DB"],
+
+  CLOUDPILOT_WORKSPACE_ID: process.env["CLOUDPILOT_WORKSPACE_ID"],
+  CLOUDPILOT_EXPERIMENTAL_WORKSPACES: enabledByExperimental("CLOUDPILOT_EXPERIMENTAL_WORKSPACES"),
+
+  // Evaluated at access time (not module load) because tests, the CLI, and
+  // external tooling set these env vars at runtime.
+  get CLOUDPILOT_DISABLE_PROJECT_CONFIG() {
+    return truthy("CLOUDPILOT_DISABLE_PROJECT_CONFIG")
+  },
+  get CLOUDPILOT_EXPERIMENTAL_REFERENCES() {
+    return enabledByExperimental("CLOUDPILOT_EXPERIMENTAL_REFERENCES")
+  },
+  get CLOUDPILOT_TUI_CONFIG() {
+    return process.env["CLOUDPILOT_TUI_CONFIG"]
+  },
+  get CLOUDPILOT_CONFIG_DIR() {
+    return process.env["CLOUDPILOT_CONFIG_DIR"]
+  },
+  get CLOUDPILOT_PURE() {
+    return truthy("CLOUDPILOT_PURE")
+  },
+  get CLOUDPILOT_PERMISSION() {
+    return process.env["CLOUDPILOT_PERMISSION"]
+  },
+  get CLOUDPILOT_PLUGIN_META_FILE() {
+    return process.env["CLOUDPILOT_PLUGIN_META_FILE"]
+  },
+  get CLOUDPILOT_CLIENT() {
+    return process.env["CLOUDPILOT_CLIENT"] ?? "cli"
+  },
+}
