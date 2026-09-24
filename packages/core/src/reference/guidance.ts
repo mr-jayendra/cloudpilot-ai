@@ -39,6 +39,8 @@ const layer = Layer.effect(
     return Service.of({
       load: Effect.fn("ReferenceGuidance.load")(function* () {
         const available = (yield* references.list())
+          // Drop malformed entries defensively so prompt building never crashes.
+          .filter((reference) => !!reference && typeof reference.name === "string")
           .filter((reference) => reference.description !== undefined)
           .map((reference) => ({
             name: reference.name,

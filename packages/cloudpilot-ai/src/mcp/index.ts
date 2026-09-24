@@ -620,7 +620,10 @@ const layer = Layer.effect(
         .map(([name, item]) => ({
           name,
           instructions: item,
-          tools: (s.defs[name] ?? []).map((tool) => McpCatalog.toolName(name, tool.name)),
+          // Drop malformed tool entries defensively so prompt building never crashes.
+          tools: (s.defs[name] ?? [])
+            .filter((tool) => !!tool && typeof tool.name === "string")
+            .map((tool) => McpCatalog.toolName(name, tool.name)),
         }))
     })
 

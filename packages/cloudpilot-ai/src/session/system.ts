@@ -67,7 +67,13 @@ const layer = Layer.effect(
       environment: Effect.fn("SystemPrompt.environment")(function* (model: Provider.Model) {
         const ctx = yield* InstanceState.context
         const references = yield* Effect.gen(function* () {
-          return (yield* (yield* Reference.Service).list()).filter((reference) => reference.description !== undefined)
+          const list = yield* (yield* Reference.Service).list()
+          // Drop malformed entries defensively: a single bad reference must
+          // never crash prompt building with an inscrutable server error.
+          return list.filter(
+            (reference): reference is typeof list[number] =>
+              !!reference && typeof reference.name === "string" && reference.description !== undefined,
+          )
         }).pipe(Effect.provide(locations.get(Location.Ref.make({ directory: AbsolutePath.make(ctx.directory) }))))
         return [
           [
